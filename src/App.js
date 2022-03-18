@@ -2,19 +2,22 @@ import React from "react";
 
 class App extends React.Component {
 
-  state = {names: [] }; //Initial State
+  state = {
+      names: [],
+      name: '' 
+  }; //Initial State
 
   onFormSubmit = (evt) => {
     evt.preventDefault();
-
-    const name = this.refs.name.value;
-
-    const names = [...this.state.names, name];
+    const names = [...this.state.names, this.state.name];
     
     // this.setState({names : names}); //If key and value are same  then we can use following syntax
     
-    this.setState({names});
-    this.refs.name.value = "";
+    this.setState({names, name:''});
+  }
+
+  onNameChange = (evt) => {
+      this.setState( {name: evt.target.value});
   }
 
   render() {
@@ -25,7 +28,8 @@ class App extends React.Component {
             <input 
                 type="text"
                 placeholder="Enter name"
-                ref="name"
+                onChange={this.onNameChange}
+                value={this.state.name}
             />
             <input type="Submit" />
         </form> 
