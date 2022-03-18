@@ -2,10 +2,20 @@ import React from "react";
 
 class App extends React.Component {
 
-onFormSubmit = (evt) => {
-  evt.preventDefault();
-  console.log(this.refs.name.value);
-}
+  state = {names: [] }; //Initial State
+
+  onFormSubmit = (evt) => {
+    evt.preventDefault();
+
+    const name = this.refs.name.value;
+
+    const names = [...this.state.names, name];
+    
+    // this.setState({names : names}); //If key and value are same  then we can use following syntax
+    
+    this.setState({names});
+    this.refs.name.value = "";
+  }
 
   render() {
     return (
@@ -19,6 +29,12 @@ onFormSubmit = (evt) => {
             />
             <input type="Submit" />
         </form> 
+        <div>
+          <h3>Registered Users</h3>
+          <ul>
+            { this.state.names.map((name, i) => <li key={i}>{name}</li>) }
+          </ul>
+        </div>
       </div>
     );
   }
