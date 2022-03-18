@@ -1,12 +1,13 @@
 import React from "react";
 import isEmail from "validator/lib/isEmail";
+import Field from './Field';
 
 class App extends React.Component {
 
   state = {
     fields: {
-      name: '',
-      email: ''
+      name: "",
+      email: ""
     },
     fieldErrors: {},
     people: []
@@ -14,13 +15,11 @@ class App extends React.Component {
 
   onFormSubmit = (evt) => {
     evt.preventDefault();
+
     const person = this.state.fields;
     const people = [...this.state.people];
-    const fieldErrors = this.validate(person);
-
-    this.setState({fieldErrors});
     
-    if(Object.keys(fieldErrors).length) return;
+    if(this.validate()) return;
 
     this.setState({
       people: people.concat(person),
@@ -31,22 +30,26 @@ class App extends React.Component {
       });
   }
 
-  validate = person => {
-    const errors = {};
+  validate = () => {
+    const person = this.state.fields;
+    const fieldErrors = this.state.fieldErrors;
 
-    if(! person.name) errors.name = 'Name Required';
-    if(! person.email) errors.email = 'Email Required';
+    const errorMessages = Object.keys(fieldErrors).filter(key => fieldErrors[key]);
 
-    if(person.email && ! isEmail(person.email) ) errors.email = 'Invalid Email';
+    if(!person.name) return true;
+    if(!person.email) return true;
+    if(errorMessages.length) return true;
 
-    return errors;
-
+    return false;
   }
 
-  onInputChange = (evt) => {
+  onInputChange = ({name, value, error}) => {
     const fields = Object.assign({}, this.state.fields);
-    fields[evt.target.name] = evt.target.value;
-    this.setState( {fields});
+    const fieldErrors = Object.assign({}, this.state.fieldErrors);
+
+    fields[name] = value;
+    fieldErrors[name] = error;
+    this.setState( {fields, fieldErrors});
   }
 
   render() {
@@ -54,22 +57,22 @@ class App extends React.Component {
       <div>
         <h2>Sign Up Sheet</h2>
         <form onSubmit={this.onFormSubmit} >
-            <input 
+            <Field 
                 name="name"
                 placeholder="Enter name"
-                onChange={this.onInputChange}
                 value={this.state.fields.name}
+                onChange={this.onInputChange}
+                validate={val => (val ? false : 'Name Required')}
             />
-            <span style={{color: 'red'}}>{this.state.fieldErrors.name}</span>
             <br/>
             <br/>
-            <input 
+            <Field 
                 name="email"
                 placeholder="Enter Email"
-                onChange={this.onInputChange}
                 value={this.state.fields.email}
+                onChange={this.onInputChange}
+                validate={val => (isEmail(val) ? false : 'Invalid Email')}
             />
-            <span style={{color: 'red'}}>{this.state.fieldErrors.email}</span>
             <input type="Submit" />
         </form> 
         <div>
