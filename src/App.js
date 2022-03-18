@@ -1,4 +1,5 @@
 import React from "react";
+import isEmail from "validator/lib/isEmail";
 
 class App extends React.Component {
 
@@ -7,22 +8,39 @@ class App extends React.Component {
       name: '',
       email: ''
     },
+    fieldErrors: {},
     people: []
   }; //Initial State
 
   onFormSubmit = (evt) => {
     evt.preventDefault();
-    const people = [...this.state.people, this.state.fields];
+    const person = this.state.fields;
+    const people = [...this.state.people];
+    const fieldErrors = this.validate(person);
+
+    this.setState({fieldErrors});
     
-    // this.setState({names : names}); //If key and value are same  then we can use following syntax
-    
+    if(Object.keys(fieldErrors).length) return;
+
     this.setState({
-      people,
+      people: people.concat(person),
       fields: {
          name:'',
          email: ''
       }
       });
+  }
+
+  validate = person => {
+    const errors = {};
+
+    if(! person.name) errors.name = 'Name Required';
+    if(! person.email) errors.email = 'Email Required';
+
+    if(person.email && ! isEmail(person.email) ) errors.email = 'Invalid Email';
+
+    return errors;
+
   }
 
   onInputChange = (evt) => {
@@ -42,12 +60,16 @@ class App extends React.Component {
                 onChange={this.onInputChange}
                 value={this.state.fields.name}
             />
+            <span style={{color: 'red'}}>{this.state.fieldErrors.name}</span>
+            <br/>
+            <br/>
             <input 
                 name="email"
                 placeholder="Enter Email"
                 onChange={this.onInputChange}
                 value={this.state.fields.email}
             />
+            <span style={{color: 'red'}}>{this.state.fieldErrors.email}</span>
             <input type="Submit" />
         </form> 
         <div>
